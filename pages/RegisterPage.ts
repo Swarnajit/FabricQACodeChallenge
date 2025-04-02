@@ -1,54 +1,74 @@
-import { expect, Locator } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { Utility } from '../utility/Utility';
 
 export class RegisterPage extends BasePage {
-	readonly firstName: Locator = this.page.locator(
+	readonly firstNameLocator: Locator = this.page.locator(
 		'[id="customer\\.firstName"]'
 	);
-	readonly lastName: Locator = this.page.locator('[id="customer\\.lastName"]');
-	readonly addressStreet: Locator = this.page.locator(
+	readonly lastNameLocator: Locator = this.page.locator(
+		'[id="customer\\.lastName"]'
+	);
+	readonly addressStreetLocator: Locator = this.page.locator(
 		'[id="customer\\.address\\.street"]'
 	);
-	readonly addressCity: Locator = this.page.locator(
+	readonly addressCityLocator: Locator = this.page.locator(
 		'[id="customer\\.address\\.city"]'
 	);
-	readonly addressState: Locator = this.page.locator(
+	readonly addressStateLocator: Locator = this.page.locator(
 		'[id="customer\\.address\\.state"]'
 	);
-	readonly zipCode: Locator = this.page.locator(
+	readonly zipCodeLocator: Locator = this.page.locator(
 		'[id="customer\\.address\\.zipCode"]'
 	);
-	readonly phoneNumber: Locator = this.page.locator(
+	readonly phoneNumberLocator: Locator = this.page.locator(
 		'[id="customer\\.phoneNumber"]'
 	);
-	readonly socialSecurity: Locator = this.page.locator('[id="customer\\.ssn"]');
-	readonly userName: Locator = this.page.locator('[id="customer\\.username"]');
-	readonly password: Locator = this.page.locator('[id="customer\\.password"]');
-	readonly confirmPassword: Locator = this.page.locator('#repeatedPassword');
+	readonly socialSecurityLocator: Locator = this.page.locator(
+		'[id="customer\\.ssn"]'
+	);
+	readonly userNameLocator: Locator = this.page.locator(
+		'[id="customer\\.username"]'
+	);
+	readonly passwordLocator: Locator = this.page.locator(
+		'[id="customer\\.password"]'
+	);
+	readonly confirmPasswordLocator: Locator =
+		this.page.locator('#repeatedPassword');
 	readonly registerButton: Locator = this.page.getByRole('button', {
 		name: 'Register',
 	});
 
+	readonly logOutLink: Locator = this.page.getByRole('link', {
+		name: 'Log Out',
+	});
+
+	readonly randomNum: number = this.generateRandomNumber(1000, 9999);
+	readonly firstName: string = this.generateFirstName(this.randomNum);
+	readonly userName: string = this.generateUserName(this.firstName);
+	readonly password: string = this.generatePassword(this.firstName);
+
 	readonly welcomeMessage = this.page.locator("//div[@id='rightPanel']");
 
+	constructor(page: Page) {
+		super(page);
+		Utility.writeJsonData(this.userName, this.password);
+	}
+
 	async createUser(): Promise<void> {
-		const randomNum: number = this.generateRandomNumber(1000, 9999);
-		const firstName: string = this.generateFirstName(randomNum);
-		const password: string = this.generatePassword(firstName);
-		const userName: string = this.generateUserName(firstName);
 		const lastName: string = 'Sample';
 
-		await this.firstName.fill(firstName);
-		await this.lastName.fill(lastName);
-		await this.addressStreet.fill('Baker Street');
-		await this.addressCity.fill('London');
-		await this.addressState.fill('India');
-		await this.zipCode.fill(randomNum.toString());
-		await this.phoneNumber.fill(this.generatePhoneNumber());
-		await this.socialSecurity.fill(firstName);
-		await this.userName.fill(userName);
-		await this.password.fill(password);
-		await this.confirmPassword.fill(password);
+		await this.firstNameLocator.fill(this.firstName);
+		await this.lastNameLocator.fill(lastName);
+		await this.addressStreetLocator.fill('Baker Street');
+		await this.addressCityLocator.fill('London');
+		await this.addressStateLocator.fill('India');
+		await this.zipCodeLocator.fill(this.randomNum.toString());
+		await this.phoneNumberLocator.fill(this.generatePhoneNumber());
+		await this.socialSecurityLocator.fill(this.firstName);
+		await this.userNameLocator.fill(this.userName);
+		await this.passwordLocator.fill(this.password);
+		await this.confirmPasswordLocator.fill(this.password);
 		await this.registerButton.click();
 
 		// expect(await this.showsNameOnSuccess.innerText()).toEqual(
@@ -56,16 +76,12 @@ export class RegisterPage extends BasePage {
 		// );
 
 		expect(await this.welcomeMessage.innerText()).toContain(
-			`Welcome ${userName}`
+			`Welcome ${this.userName}`
 		);
 
 		expect(await this.welcomeMessage.innerText()).toContain(
 			'Your account was created'
 		);
-
-		// console.log(await this.welcomeMessage.innerText());
-
-		// console.log(password);
 	}
 
 	private generateFirstName(newNumber: number): string {

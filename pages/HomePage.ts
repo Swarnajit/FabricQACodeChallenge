@@ -1,8 +1,9 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { RegisterPage } from './RegisterPage';
 import { BasePage } from './BasePage';
 import { OverviewPage } from './OverviewPage';
 import { Credentials } from '../playwright.config';
+import { Utility } from '../utility/Utility';
 
 export class HomePage extends BasePage {
 	readonly registerLink: Locator = this.page.getByRole('link', {
@@ -26,8 +27,8 @@ export class HomePage extends BasePage {
 	}
 
 	async loginToApplication(): Promise<OverviewPage> {
-		await this.userName.fill('user799189801');
-		await this.password.fill('9775user7991');
+		await this.userName.fill(Utility.getUserNameFromFile());
+		await this.password.fill(Utility.getPasswordFromFile());
 		await this.loginButton.click();
 		return Promise.resolve(new OverviewPage(this.page));
 	}
