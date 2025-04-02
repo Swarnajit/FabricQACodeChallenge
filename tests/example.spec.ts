@@ -16,9 +16,9 @@ test.beforeAll(async ({browser})=>{
 
 });
 
-test("First test", async()=>{
+test("Register a user", async()=>{
 
   registerPage = await homePage.openRegisterPage();
 
-  await registerPage.firstName.fill("Swarnajit");
+  await registerPage.createUser();
 });
