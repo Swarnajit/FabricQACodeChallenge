@@ -13,4 +13,16 @@ export class FindTransactionPage extends BasePage {
 	readonly enterAmount: Locator = this.page.locator("//input[@id='amount']");
 
 	readonly findByAmountButton: Locator = this.page.locator('#findByAmount');
+
+	readonly transactionResultHeader = this.page.getByRole('heading', {
+		name: 'Transaction Results',
+	});
+
+	readonly firstSentTransaction = this.page
+		.getByRole('cell', { name: 'Funds Transfer Sent' })
+		.first();
+
+	readonly transactionId = this.page
+		.locator('td:right-of(:text("Transaction ID"))')
+		.first();
 }

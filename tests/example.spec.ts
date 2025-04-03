@@ -12,6 +12,9 @@ let overviewPage: OverviewPage;
 let transferFundPage: TransferFundPage;
 let findTransactionPage: FindTransactionPage;
 
+var fromAccountNum: string = '';
+var existingAccountNum: string = '';
+
 test.beforeAll(async ({ browser }) => {
 	page = await browser.newPage();
 
@@ -32,30 +35,36 @@ test('User Login', async () => {
 	overviewPage = await homePage.loginToApplication();
 
 	expect(await overviewPage.showsNameOnSuccess.innerText()).toContain(
-		`Welcome`
+		'Welcome'
 	);
+
+	existingAccountNum = await overviewPage.accountNum.innerText();
+	// console.log(await overviewPage.accountBalance.innerText());
+	// console.log(await overviewPage.availableAmount.innerText());
+
+	expect(await overviewPage.accountBalance.innerText()).toContain('500');
+
+	expect(await overviewPage.availableAmount.innerText()).toContain('500');
 });
 
-test.skip('Get Account number', async () => {
+test('Get Account number', async () => {
 	await overviewPage.openNewAccountLink.click();
 
 	await overviewPage.openNewAccountButton.waitFor();
 
-	var existingAccountNum = '';
-
-	while (!existingAccountNum) {
-		existingAccountNum = await overviewPage.page
+	while (!fromAccountNum) {
+		fromAccountNum = await overviewPage.page
 			.locator('#fromAccountId')
 			.innerText();
 
 		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
 
+	expect(fromAccountNum).toEqual(existingAccountNum);
+
 	await overviewPage.typeOfAccount.selectOption('1');
 
 	await overviewPage.openNewAccountButton.click({ timeout: 10000 });
-
-	await expect(overviewPage.accountOpenedHeading).toBeVisible();
 
 	var addedAccountNum = await overviewPage.page
 		.locator("//a[@id='newAccountId']")
@@ -74,7 +83,7 @@ test.skip('Get Account number', async () => {
 	await transferFundPage.transferButton.click();
 });
 
-test.skip('Find Transaction', async () => {
+test('Find Transaction', async () => {
 	findTransactionPage = await overviewPage.gotoFindTransactionPage();
 
 	await expect(findTransactionPage.findTransactionHeader).toBeVisible();
@@ -82,4 +91,17 @@ test.skip('Find Transaction', async () => {
 	await findTransactionPage.enterAmount.fill('100');
 
 	await findTransactionPage.findByAmountButton.click();
+
+	await expect(findTransactionPage.transactionResultHeader).toBeInViewport();
+
+	expect(
+		await findTransactionPage.firstSentTransaction.isVisible(),
+		"'No transaction has been taken place'"
+	).toBeTruthy();
+
+	await findTransactionPage.firstSentTransaction.click();
+
+	await findTransactionPage.transactionId.isVisible();
+
+	// console.log(await findTransactionPage.transactionId.innerText());
 });

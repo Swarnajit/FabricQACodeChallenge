@@ -4,17 +4,25 @@ import { TransferFundPage } from './TransferFundPage';
 import { FindTransactionPage } from './FindTransactionPage';
 
 export class OverviewPage extends BasePage {
-	readonly showsNameOnSuccess = this.page.locator("//p[@class='smallText']");
-	readonly overViewHeading = this.page.locator(
+	readonly showsNameOnSuccess: Locator = this.page.locator(
+		"//p[@class='smallText']"
+	);
+	readonly overViewHeading: Locator = this.page.locator(
 		"//h1[normalize-space()='Accounts Overview']"
 	);
 
+	readonly accountNum = this.page.locator('td:near(:text("Account"))').first();
+
+	readonly accountBalance = this.page
+		.locator('td:below(:text("Balance"))')
+		.first();
+
+	readonly availableAmount = this.page
+		.locator('td:near(:text("Available Amount"))')
+		.first();
+
 	readonly openNewAccountLink: Locator = this.page.getByRole('link', {
 		name: 'Open New Account',
-	});
-
-	readonly accountsOverviewLink: Locator = this.page.getByRole('link', {
-		name: 'Accounts Overview',
 	});
 
 	readonly transferFundsLink: Locator = this.page.getByRole('link', {
