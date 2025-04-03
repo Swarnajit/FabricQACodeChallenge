@@ -1,5 +1,6 @@
 import { Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { TransferFundPage } from './TransferFundPage';
 
 export class OverviewPage extends BasePage {
 	readonly showsNameOnSuccess = this.page.locator("//p[@class='smallText']");
@@ -35,4 +36,9 @@ export class OverviewPage extends BasePage {
 	readonly accountOpenedHeading: Locator = this.page.getByRole('heading', {
 		name: 'Account Opened!',
 	});
+
+	async gotoTransferPage(): Promise<TransferFundPage> {
+		await this.transferFundsLink.click();
+		return Promise.resolve(new TransferFundPage(this.page));
+	}
 }
