@@ -21,7 +21,7 @@ test.beforeAll(async ({ browser }) => {
 	homePage = await new HomePage(page).gotoHomePage();
 });
 
-test.skip('Register a user', async () => {
+test('Register a user', async () => {
 	registerPage = await homePage.openRegisterPage();
 
 	await registerPage.createUser();
@@ -38,9 +38,13 @@ test('User Login', async () => {
 		'Welcome'
 	);
 
-	existingAccountNum = await overviewPage.accountNum.innerText();
-	// console.log(await overviewPage.accountBalance.innerText());
-	// console.log(await overviewPage.availableAmount.innerText());
+	const regex = /^[0-9]+$/;
+
+	while (!existingAccountNum || !regex.test(existingAccountNum)) {
+		existingAccountNum = await overviewPage.accountNum.innerText();
+
+		await new Promise((resolve) => setTimeout(resolve, 100));
+	}
 
 	expect(await overviewPage.accountBalance.innerText()).toContain('500');
 
