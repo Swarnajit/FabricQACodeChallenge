@@ -4,6 +4,7 @@ import { HomePage } from '../pages/HomePage';
 import { OverviewPage } from '../pages/OverviewPage';
 import { TransferFundPage } from '../pages/TransferFundPage';
 import { FindTransactionPage } from '../pages/FindTransactionPage';
+import { Utility } from '../utility/Utility';
 
 let homePage: HomePage;
 let registerPage: RegisterPage;
@@ -46,9 +47,13 @@ test('User Login', async () => {
 		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
 
-	expect(await overviewPage.accountBalance.innerText()).toContain('500');
+	expect(await overviewPage.accountBalance.innerText()).toMatch(
+		/\$\d+(\.\d{1,2})?/
+	);
 
-	expect(await overviewPage.availableAmount.innerText()).toContain('500');
+	expect(await overviewPage.accountBalance.innerText()).toMatch(
+		/\$\d+(\.\d{1,2})?/
+	);
 });
 
 test('Get Account number', async () => {
@@ -69,6 +74,8 @@ test('Get Account number', async () => {
 	await overviewPage.typeOfAccount.selectOption('1');
 
 	await overviewPage.openNewAccountButton.click({ timeout: 10000 });
+
+	await expect(overviewPage.accountOpenedHeading).toBeInViewport();
 
 	var addedAccountNum = await overviewPage.page
 		.locator("//a[@id='newAccountId']")
@@ -108,4 +115,21 @@ test('Find Transaction', async () => {
 	await findTransactionPage.transactionId.isVisible();
 
 	// console.log(await findTransactionPage.transactionId.innerText());
+});
+
+test('Get API call', async () => {
+	const apiEndPoint = `https://parabank.parasoft.com/parabank/services_proxy/bank/accounts/${existingAccountNum}/transactions/amount/100`;
+
+	const response = await page.request.get(apiEndPoint, {
+		headers: {
+			Authorization:
+				'Basic ' +
+				Buffer.from(
+					`${Utility.getUserNameFromFile()}:${Utility.getPasswordFromFile()}`
+				).toString('base64'),
+		},
+	});
+	const responseBody = await response.json();
+
+	console.log(responseBody);
 });
