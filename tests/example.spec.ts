@@ -3,12 +3,14 @@ import { RegisterPage } from '../pages/RegisterPage';
 import { HomePage } from '../pages/HomePage';
 import { OverviewPage } from '../pages/OverviewPage';
 import { TransferFundPage } from '../pages/TransferFundPage';
+import { FindTransactionPage } from '../pages/FindTransactionPage';
 
 let homePage: HomePage;
 let registerPage: RegisterPage;
 let page: Page;
 let overviewPage: OverviewPage;
 let transferFundPage: TransferFundPage;
+let findTransactionPage: FindTransactionPage;
 
 test.beforeAll(async ({ browser }) => {
 	page = await browser.newPage();
@@ -37,35 +39,21 @@ test('User Login', async () => {
 test.skip('Get Account number', async () => {
 	await overviewPage.openNewAccountLink.click();
 
-	await overviewPage.page.waitForTimeout(2000);
+	await overviewPage.openNewAccountButton.waitFor();
 
-	await overviewPage.openNewAccountButton.waitFor({
-		state: 'visible',
-		timeout: 10000,
-	});
+	var existingAccountNum = '';
 
-	// await expect(overviewPage.accountsOverviewLink).toBeVisible();
+	while (!existingAccountNum) {
+		existingAccountNum = await overviewPage.page
+			.locator('#fromAccountId')
+			.innerText();
 
-	// await page.locator('#type').selectOption('0');
-	// await page.locator('#type').selectOption('1');
-
-	var existingAccountNum = await overviewPage.page
-		.locator('#fromAccountId')
-		.innerText();
-
-	// await overviewPage.openNewAccountButton.click({ timeout: 10000 });
-
-	const isButtonEnabled = await overviewPage.openNewAccountButton.isEnabled();
-	console.log('Is the openNewAccountButton enabled:', isButtonEnabled);
-
-	if (isButtonEnabled) {
-		await overviewPage.openNewAccountButton.click({
-			timeout: 10000,
-			force: true,
-		});
-	} else {
-		console.error('The openNewAccountButton is not enabled.');
+		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
+
+	await overviewPage.typeOfAccount.selectOption('1');
+
+	await overviewPage.openNewAccountButton.click({ timeout: 10000 });
 
 	await expect(overviewPage.accountOpenedHeading).toBeVisible();
 
@@ -84,4 +72,14 @@ test.skip('Get Account number', async () => {
 	await transferFundPage.toAccount.selectOption(addedAccountNum);
 
 	await transferFundPage.transferButton.click();
+});
+
+test.skip('Find Transaction', async () => {
+	findTransactionPage = await overviewPage.gotoFindTransactionPage();
+
+	await expect(findTransactionPage.findTransactionHeader).toBeVisible();
+
+	await findTransactionPage.enterAmount.fill('100');
+
+	await findTransactionPage.findByAmountButton.click();
 });

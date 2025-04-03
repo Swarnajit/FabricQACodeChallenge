@@ -1,9 +1,13 @@
 import { Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { TransferFundPage } from './TransferFundPage';
+import { FindTransactionPage } from './FindTransactionPage';
 
 export class OverviewPage extends BasePage {
 	readonly showsNameOnSuccess = this.page.locator("//p[@class='smallText']");
+	readonly overViewHeading = this.page.locator(
+		"//h1[normalize-space()='Accounts Overview']"
+	);
 
 	readonly openNewAccountLink: Locator = this.page.getByRole('link', {
 		name: 'Open New Account',
@@ -37,8 +41,15 @@ export class OverviewPage extends BasePage {
 		name: 'Account Opened!',
 	});
 
+	readonly typeOfAccount: Locator = this.page.locator('#type');
+
 	async gotoTransferPage(): Promise<TransferFundPage> {
 		await this.transferFundsLink.click();
 		return Promise.resolve(new TransferFundPage(this.page));
+	}
+
+	async gotoFindTransactionPage(): Promise<FindTransactionPage> {
+		await this.findTransactionsLink.click();
+		return Promise.resolve(new FindTransactionPage(this.page));
 	}
 }
