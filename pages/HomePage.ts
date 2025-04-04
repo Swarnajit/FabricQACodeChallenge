@@ -16,6 +16,10 @@ export class HomePage extends BasePage {
 		name: 'Log In',
 	});
 
+	readonly errorHeader: Locator = this.page.getByRole('heading', {
+		name: 'Error!',
+	});
+
 	async gotoHomePage(): Promise<HomePage> {
 		await this.page.goto(Credentials.CONFIG_URL);
 		return Promise.resolve(new HomePage(this.page));
@@ -26,9 +30,19 @@ export class HomePage extends BasePage {
 		return Promise.resolve(new RegisterPage(this.page));
 	}
 
+	async tryUnsuccessfulLogin(
+		nameOfUser: string,
+		passwordDetails: string
+	): Promise<void> {
+		await this.userName.fill(nameOfUser);
+		await this.password.fill(passwordDetails);
+		await this.loginButton.click();
+		return Promise.resolve();
+	}
+
 	async loginToApplication(): Promise<OverviewPage> {
-		await this.userName.fill(Utility.getUserNameFromFile());
-		await this.password.fill(Utility.getPasswordFromFile());
+		await this.userName.fill(Utility.getValue('userName'));
+		await this.password.fill(Utility.getValue('password'));
 		await this.loginButton.click();
 		return Promise.resolve(new OverviewPage(this.page));
 	}

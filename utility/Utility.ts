@@ -5,30 +5,12 @@ import * as fs from 'fs';
 export class Utility {
 	static readonly filePath = './data/details.json';
 	static jsonData: any;
-	// jsonData = JSON.parse(fs.readFileSync(Utility.filePath, 'utf8'));
 
-	/**
-	 * Load JSON data from the file and update with provided userName and password.
-	 * @param userName - The user name to be updated in the JSON data.
-	 * @param password - The password to be updated in the JSON data.
-	 */
-
-	public static getUserNameFromFile(): string {
+	public static getValue(key: string): string {
 		try {
 			const data = fs.readFileSync(this.filePath, 'utf-8');
 			this.jsonData = JSON.parse(data);
-			return this.jsonData.userName;
-		} catch (error) {
-			console.error('Error loading JSON file:', error);
-			return '';
-		}
-	}
-
-	public static getPasswordFromFile(): string {
-		try {
-			const data = fs.readFileSync(this.filePath, 'utf-8');
-			this.jsonData = JSON.parse(data);
-			return this.jsonData.password;
+			return this.jsonData[key] ?? '';
 		} catch (error) {
 			console.error('Error loading JSON file:', error);
 			return '';

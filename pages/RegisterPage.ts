@@ -1,40 +1,42 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { Utility } from '../utility/Utility';
 
 export class RegisterPage extends BasePage {
+	readonly registerPageHeader: Locator = this.page.getByRole('heading', {
+		name: 'Signing up is easy!',
+	});
+
 	readonly firstNameLocator: Locator = this.page.locator(
 		'[id="customer\\.firstName"]'
 	);
-	readonly lastNameLocator: Locator = this.page.locator(
-		'[id="customer\\.lastName"]'
-	);
-	readonly addressStreetLocator: Locator = this.page.locator(
+
+	readonly lastName: Locator = this.page.locator('[id="customer\\.lastName"]');
+	readonly address: Locator = this.page.locator(
 		'[id="customer\\.address\\.street"]'
 	);
-	readonly addressCityLocator: Locator = this.page.locator(
+	readonly city: Locator = this.page.locator(
 		'[id="customer\\.address\\.city"]'
 	);
-	readonly addressStateLocator: Locator = this.page.locator(
+	readonly state: Locator = this.page.locator(
 		'[id="customer\\.address\\.state"]'
 	);
-	readonly zipCodeLocator: Locator = this.page.locator(
+	readonly zipCode: Locator = this.page.locator(
 		'[id="customer\\.address\\.zipCode"]'
 	);
-	readonly phoneNumberLocator: Locator = this.page.locator(
+	readonly phoneNumber: Locator = this.page.locator(
 		'[id="customer\\.phoneNumber"]'
 	);
-	readonly socialSecurityLocator: Locator = this.page.locator(
-		'[id="customer\\.ssn"]'
-	);
+	readonly socialSecurity: Locator = this.page.locator('[id="customer\\.ssn"]');
 	readonly userNameLocator: Locator = this.page.locator(
 		'[id="customer\\.username"]'
 	);
 	readonly passwordLocator: Locator = this.page.locator(
 		'[id="customer\\.password"]'
 	);
-	readonly confirmPasswordLocator: Locator =
-		this.page.locator('#repeatedPassword');
+
+	readonly confirmPassword: Locator = this.page.locator('#repeatedPassword');
+
 	readonly registerButton: Locator = this.page.getByRole('button', {
 		name: 'Register',
 	});
@@ -55,37 +57,25 @@ export class RegisterPage extends BasePage {
 		Utility.writeJsonData(this.userName, this.password);
 	}
 
-	async createUser(): Promise<void> {
-		const lastName: string = 'Sample';
-
+	async inputUserDetails(): Promise<void> {
 		await this.firstNameLocator.fill(this.firstName);
-		await this.lastNameLocator.fill(lastName);
-		await this.addressStreetLocator.fill('Baker Street');
-		await this.addressCityLocator.fill('London');
-		await this.addressStateLocator.fill('India');
-		await this.zipCodeLocator.fill(this.randomNum.toString());
-		await this.phoneNumberLocator.fill(this.generatePhoneNumber());
-		await this.socialSecurityLocator.fill(this.firstName);
+		await this.lastName.fill(Utility.getValue('lastName'));
+		await this.address.fill(Utility.getValue('streetName'));
+		await this.city.fill(Utility.getValue('city'));
+		await this.state.fill(Utility.getValue('state'));
+		await this.zipCode.fill(Utility.getValue('zipCode'));
+		await this.phoneNumber.fill(Utility.getValue('phoneNumber1'));
+		await this.socialSecurity.fill(this.firstName);
 		await this.userNameLocator.fill(this.userName);
-		await this.passwordLocator.fill(this.password);
-		await this.confirmPasswordLocator.fill(this.password);
-		await this.registerButton.click();
+	}
 
-		// expect(await this.showsNameOnSuccess.innerText()).toEqual(
-		// 	`Welcome ${firstName} ${lastName}`
-		// );
-
-		expect(await this.welcomeMessage.innerText()).toContain(
-			`Welcome ${this.userName}`
-		);
-
-		expect(await this.welcomeMessage.innerText()).toContain(
-			'Your account was created'
-		);
+	async inputPassword(passwordDetails: string, confirmPassword: string) {
+		await this.passwordLocator.fill(passwordDetails);
+		await this.confirmPassword.fill(confirmPassword);
 	}
 
 	private generateFirstName(newNumber: number): string {
-		return `user${newNumber}`;
+		return `${Utility.getValue('firstName')}${newNumber}`;
 	}
 
 	private generateUserName(firstName: string): string {
@@ -99,11 +89,6 @@ export class RegisterPage extends BasePage {
 	}
 
 	private generateRandomNumber(min: number, max: number): number {
-		// return Math.floor(1000 + Math.random() * 9000);
 		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
-
-	private generatePhoneNumber(): string {
-		return Math.floor(Math.random() * 1000000000).toString();
 	}
 }

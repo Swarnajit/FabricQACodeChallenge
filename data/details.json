@@ -1,6 +1,15 @@
 {
-  "firstName": "John Doe",
-  "userName": "user275190811",
-  "password": "3030user2751",
-  "city": "New York"
+  "firstName": "Swarno",
+  "lastName": "Sample",
+  "streetName": "Baker Street",
+  "city": "Miami",
+  "state": "Liquid",
+  "zipCode": "500084",
+  "payeeName": "frodo",
+  "phoneNumber1": "1234567890",
+  "phoneNumber2": "0987654321",
+  "billAccountNum": "23340",
+  "amount": "100",
+  "userName": "Swarno444639771",
+  "password": "8687Swarno4446"
 }

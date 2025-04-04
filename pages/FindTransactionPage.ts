@@ -18,8 +18,12 @@ export class FindTransactionPage extends BasePage {
 		name: 'Transaction Results',
 	});
 
-	readonly firstSentTransaction = this.page
+	readonly fundTransferTransaction = this.page
 		.getByRole('cell', { name: 'Funds Transfer Sent' })
+		.first();
+
+	readonly billPaymentTransaction = this.page
+		.locator('td', { hasText: 'Bill Payment to ' })
 		.first();
 
 	readonly transactionId = this.page

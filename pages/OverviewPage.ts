@@ -2,6 +2,7 @@ import { Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { TransferFundPage } from './TransferFundPage';
 import { FindTransactionPage } from './FindTransactionPage';
+import { BillPaymentpage } from './BillPaymentpage';
 
 export class OverviewPage extends BasePage {
 	readonly showsNameOnSuccess: Locator = this.page.locator(
@@ -51,6 +52,9 @@ export class OverviewPage extends BasePage {
 
 	readonly typeOfAccount: Locator = this.page.locator('#type');
 
+	readonly fromAccountId: Locator = this.page.locator('#fromAccountId');
+	readonly newAccountId: Locator = this.page.locator("//a[@id='newAccountId']");
+
 	async gotoTransferPage(): Promise<TransferFundPage> {
 		await this.transferFundsLink.click();
 		return Promise.resolve(new TransferFundPage(this.page));
@@ -59,5 +63,10 @@ export class OverviewPage extends BasePage {
 	async gotoFindTransactionPage(): Promise<FindTransactionPage> {
 		await this.findTransactionsLink.click();
 		return Promise.resolve(new FindTransactionPage(this.page));
+	}
+
+	async gotoBillPayment(): Promise<BillPaymentpage> {
+		await this.billPayLink.click();
+		return Promise.resolve(new BillPaymentpage(this.page));
 	}
 }
