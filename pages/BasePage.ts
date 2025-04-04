@@ -13,5 +13,5 @@ export class BasePage {
 		return this._page;
 	}
 
-	static readonly TIMEOUT_SECOND_1: 1000;
+	TIMEOUT_01_SECOND: number = 1000;
 }

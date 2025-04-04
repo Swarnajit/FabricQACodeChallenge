@@ -37,7 +37,7 @@ test.describe.skip('Registration page tests', async () => {
 	});
 
 	test('Registration page textboxes are blank', async () => {
-		await registerPage.page.waitForTimeout(BasePage.TIMEOUT_SECOND_1);
+		await registerPage.page.waitForTimeout(registerPage.TIMEOUT_01_SECOND);
 
 		await registerPage.registerButton.click();
 
@@ -157,7 +157,7 @@ test.describe.skip('Bank application activities', async () => {
 			existingAccountNum = await overviewPage.accountNum.innerText();
 
 			await new Promise((resolve) =>
-				setTimeout(resolve, BasePage.TIMEOUT_SECOND_1)
+				setTimeout(resolve, overviewPage.TIMEOUT_01_SECOND)
 			);
 		}
 
@@ -174,7 +174,7 @@ test.describe.skip('Bank application activities', async () => {
 		billPaymentpage = await overviewPage.gotoBillPayment();
 
 		await new Promise((resolve) =>
-			setTimeout(resolve, BasePage.TIMEOUT_SECOND_1)
+			setTimeout(resolve, billPaymentpage.TIMEOUT_01_SECOND)
 		);
 
 		await billPaymentpage.sendPaymentButton.click();
@@ -222,7 +222,7 @@ test.describe.skip('Bank application activities', async () => {
 		await billPaymentpage.enterAccountDetails(wrongUsername, wrongPassword);
 
 		await new Promise((resolve) =>
-			setTimeout(resolve, BasePage.TIMEOUT_SECOND_1)
+			setTimeout(resolve, billPaymentpage.TIMEOUT_01_SECOND)
 		);
 
 		await billPaymentpage.sendPaymentButton.click();
@@ -240,7 +240,7 @@ test.describe.skip('Bank application activities', async () => {
 		billPaymentpage = await overviewPage.gotoBillPayment();
 
 		await new Promise((resolve) =>
-			setTimeout(resolve, BasePage.TIMEOUT_SECOND_1)
+			setTimeout(resolve, billPaymentpage.TIMEOUT_01_SECOND)
 		);
 
 		await billPaymentpage.enterBillDetails();
@@ -263,7 +263,7 @@ test.describe.skip('Bank application activities', async () => {
 		await expect(billPaymentpage.sendPaymentButton).toBeVisible();
 
 		await new Promise((resolve) =>
-			setTimeout(resolve, BasePage.TIMEOUT_SECOND_1)
+			setTimeout(resolve, billPaymentpage.TIMEOUT_01_SECOND)
 		);
 
 		await billPaymentpage.enterBillDetails();
