@@ -36,7 +36,7 @@ test.beforeAll(async ({ browser }) => {
 	homePage = await new HomePage(page).gotoHomePage();
 });
 
-test.describe.skip('Registration page tests', async () => {
+test.describe('Registration page tests', async () => {
 	test.beforeAll(async () => {
 		registerPage = await homePage.openRegisterPage();
 
@@ -128,7 +128,7 @@ test.describe.skip('Registration page tests', async () => {
 	});
 });
 
-test.describe.skip('Bank application activities', async () => {
+test.describe('Bank application activities', async () => {
 	test('User credentials are blank', async () => {
 		await homePage.tryUnsuccessfulLogin('', '');
 
@@ -416,7 +416,7 @@ test.describe.skip('Bank application activities', async () => {
 
 			expect(formattedDate).toBe(transactionDate);
 
-			expect(`$${item.amount.toString()}`).toBe(billAmount);
+			expect(item.amount.toString()).toBe(billAmount);
 			expect(item.description.toString()).toBe(transactionDesc);
 		}
 	});
