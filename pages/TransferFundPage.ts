@@ -15,4 +15,11 @@ export class TransferFundPage extends BasePage {
 	readonly transferButton: Locator = this.page.getByRole('button', {
 		name: 'Transfer',
 	});
+
+	readonly successfulTransferToSaving: Locator = this.page.getByRole(
+		'heading',
+		{
+			name: 'Transfer Complete',
+		}
+	);
 }

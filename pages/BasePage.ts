@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 export class BasePage {
 	private _page: Page;
@@ -14,4 +14,5 @@ export class BasePage {
 	}
 
 	TIMEOUT_01_SECOND: number = 1000;
+	TIMEOUT_10_SECOND: number = 1000;
 }

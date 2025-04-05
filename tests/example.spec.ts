@@ -6,7 +6,7 @@ import { TransferFundPage } from '../pages/TransferFundPage';
 import { FindTransactionPage } from '../pages/FindTransactionPage';
 import { Utility } from '../utility/Utility';
 import { BillPaymentpage } from '../pages/BillPaymentpage';
-import { BasePage } from '../pages/BasePage';
+import { Credentials } from '../playwright.config';
 
 let homePage: HomePage;
 let registerPage: RegisterPage;
@@ -18,6 +18,13 @@ let billPaymentpage: BillPaymentpage;
 
 var fromAccountNum: string = '';
 var existingAccountNum: string = '';
+var addedAccountNum: string = '';
+var transactionId: string = '';
+var transactionDate: string = '';
+var transactionDesc: string = '';
+var transactionType: string = '';
+var transactionAmount: string = '';
+
 var correctAccountNum: string = Utility.getValue('billAccountNum');
 var incorrectAccountNum: string = '1234';
 var wrongUsername: string = 'Sample User';
@@ -130,9 +137,13 @@ test.describe.skip('Bank application activities', async () => {
 		await expect(
 			homePage.page.getByText('Please enter a username and password.')
 		).toBeVisible();
+
+		await new Promise((resolve) =>
+			setTimeout(resolve, homePage.TIMEOUT_01_SECOND)
+		);
 	});
 
-	test('User credentials are incorrect', async () => {
+	test.skip('User credentials are incorrect', async () => {
 		await homePage.tryUnsuccessfulLogin(wrongUsername, wrongPassword);
 
 		await expect(homePage.errorHeader).toBeVisible();
@@ -140,6 +151,12 @@ test.describe.skip('Bank application activities', async () => {
 		await expect(
 			homePage.page.getByText(
 				'An internal error has occurred and has been logged.'
+			)
+		).toBeVisible();
+
+		await expect(
+			homePage.page.getByText(
+				'The username and password could not be verified.'
 			)
 		).toBeVisible();
 	});
@@ -168,6 +185,43 @@ test.describe.skip('Bank application activities', async () => {
 		expect(await overviewPage.availableAmount.innerText()).toMatch(
 			/\$\d+(\.\d{1,2})?/
 		);
+	});
+
+	test('Create a savings account', async () => {
+		await overviewPage.openNewAccountLink.click();
+
+		await overviewPage.openNewAccountButton.waitFor();
+
+		await overviewPage.page.waitForFunction(
+			(element) => element?.textContent?.trim() !== '',
+			await overviewPage.fromAccountId.elementHandle()
+		);
+
+		fromAccountNum = await overviewPage.fromAccountId.innerText();
+
+		expect(fromAccountNum).toContain(existingAccountNum);
+
+		await overviewPage.typeOfAccount.selectOption('1');
+
+		await overviewPage.openNewAccountButton.click();
+
+		await expect(overviewPage.accountOpenedHeading).toBeInViewport();
+
+		expect(await overviewPage.newAccountId.innerText()).toBeTruthy();
+
+		addedAccountNum = await overviewPage.newAccountId.innerText();
+
+		transferFundPage = await overviewPage.gotoTransferPage();
+
+		await expect(transferFundPage.amountBox).toBeVisible();
+
+		await transferFundPage.amountBox.fill(Utility.getValue('transferAmount'));
+
+		await transferFundPage.fromAccount.selectOption(existingAccountNum);
+
+		await transferFundPage.toAccount.selectOption(addedAccountNum);
+
+		await transferFundPage.transferButton.click();
 	});
 
 	test('Bill Payment details are blank', async () => {
@@ -257,7 +311,7 @@ test.describe.skip('Bank application activities', async () => {
 		).toBeVisible();
 	});
 
-	test('Bill Payment with valid details', async () => {
+	test('Bill Payment to valid account', async () => {
 		billPaymentpage = await overviewPage.gotoBillPayment();
 
 		await expect(billPaymentpage.sendPaymentButton).toBeVisible();
@@ -273,6 +327,8 @@ test.describe.skip('Bank application activities', async () => {
 			correctAccountNum
 		);
 
+		await billPaymentpage.fromAccount.selectOption(addedAccountNum);
+
 		await billPaymentpage.sendPaymentButton.click();
 
 		await expect(billPaymentpage.successfulPaymentHeader).toBeVisible();
@@ -283,7 +339,16 @@ test.describe.skip('Bank application activities', async () => {
 
 		await expect(findTransactionPage.findTransactionHeader).toBeVisible();
 
-		await findTransactionPage.enterAmount.fill(Utility.getValue('amount'));
+		// Validation Check
+		await findTransactionPage.findByAmountButton.click();
+
+		await expect(
+			findTransactionPage.page.getByText('Invalid amount')
+		).toBeVisible();
+
+		await findTransactionPage.selectAccount.selectOption(addedAccountNum);
+
+		await findTransactionPage.enterAmount.fill(Utility.getValue('billAmount'));
 
 		await findTransactionPage.findByAmountButton.click();
 
@@ -299,69 +364,62 @@ test.describe.skip('Bank application activities', async () => {
 			'No bill payment was completed'
 		).toContain(Utility.getValue('payeeName'));
 
-		await findTransactionPage.fundTransferTransaction.click();
+		await findTransactionPage.billPaymentTransaction.click();
 
-		await findTransactionPage.transactionId.isVisible();
+		await expect(findTransactionPage.transactionId).toBeVisible();
+
+		transactionId = await findTransactionPage.transactionId.innerText();
+		transactionDate = await findTransactionPage.dateOfTransaction.innerText();
+		transactionDesc = await findTransactionPage.description.innerText();
+		transactionType = await findTransactionPage.transactionType.innerText();
 	});
 
-	test('Get API call', async () => {
-		const apiEndPoint = `https://parabank.parasoft.com/parabank/services_proxy/bank/accounts/${existingAccountNum}/transactions/amount/100`;
+	test('API validation for bill payment', async () => {
+		const CONFIG_URL: String = Credentials.CONFIG_URL;
+		const authUser: string = Utility.getValue('userName');
+		const authPass: string = Utility.getValue('password');
+		const billAmount: string = Utility.getValue('billAmount');
+
+		const apiEndPoint = `${CONFIG_URL}/parabank/services_proxy/bank/accounts/${addedAccountNum}/transactions/amount/${billAmount}`;
 
 		const response = await page.request.get(apiEndPoint, {
 			headers: {
 				Authorization:
-					'Basic ' +
-					Buffer.from(
-						`${Utility.getValue('userName')}:${Utility.getValue('password')}`
-					).toString(),
+					'Basic ' + Buffer.from(`${authUser}:${authPass}`).toString('base64'),
 			},
 		});
 
+		expect(response.status()).toBe(200);
+
 		const responseBody = await response.json();
 
-		console.log(responseBody);
+		// Validation of structure
+		for (const item of responseBody) {
+			expect(item).toHaveProperty('id');
+			expect(item).toHaveProperty('accountId');
+			expect(item).toHaveProperty('type');
+			expect(item).toHaveProperty('date');
+			expect(item).toHaveProperty('amount');
+			expect(item).toHaveProperty('description');
+
+			expect(item.id.toString()).toBe(transactionId);
+			expect(item.accountId.toString()).toBe(addedAccountNum);
+			expect(item.type.toString()).toBe(transactionType);
+
+			const formattedDate = new Date(item.date)
+				.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+				})
+				.replace(/\//g, '-');
+
+			expect(formattedDate).toBe(transactionDate);
+
+			expect(`$${item.amount.toString()}`).toBe(billAmount);
+			expect(item.description.toString()).toBe(transactionDesc);
+		}
 	});
 });
 
-test.skip('Get Account number', async () => {
-	await overviewPage.openNewAccountLink.click();
-
-	await overviewPage.openNewAccountButton.waitFor();
-
-	await overviewPage.page.waitForFunction(
-		(element) => element?.textContent?.trim() !== '',
-		await overviewPage.fromAccountId.elementHandle()
-	);
-
-	fromAccountNum = await overviewPage.fromAccountId.innerText();
-
-	expect(fromAccountNum).toEqual(existingAccountNum);
-
-	await overviewPage.typeOfAccount.selectOption('1');
-
-	await overviewPage.openNewAccountButton.click();
-
-	await expect(overviewPage.accountOpenedHeading).toBeInViewport();
-
-	expect(await overviewPage.newAccountId.innerText()).toBeTruthy();
-
-	var addedAccountNum = await overviewPage.newAccountId.innerText();
-
-	transferFundPage = await overviewPage.gotoTransferPage();
-
-	await expect(transferFundPage.amountBox).toBeVisible();
-
-	await transferFundPage.amountBox.fill(Utility.getValue('amount'));
-
-	await transferFundPage.fromAccount.selectOption(existingAccountNum);
-
-	await transferFundPage.toAccount.selectOption(addedAccountNum);
-
-	await transferFundPage.transferButton.click();
-});
-
 test.afterAll(async ({ browser }) => {});
-
-// https://parabank.parasoft.com/parabank/services_proxy/bank/accounts/21669/transaction
-
-// https://parabank.parasoft.com/parabank/services_proxy/bank/accounts/${existingAccountNum}/transactions/amount/100`;

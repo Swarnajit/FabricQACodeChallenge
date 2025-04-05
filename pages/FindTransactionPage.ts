@@ -14,19 +14,35 @@ export class FindTransactionPage extends BasePage {
 
 	readonly findByAmountButton: Locator = this.page.locator('#findByAmount');
 
-	readonly transactionResultHeader = this.page.getByRole('heading', {
+	readonly transactionResultHeader: Locator = this.page.getByRole('heading', {
 		name: 'Transaction Results',
 	});
 
-	readonly fundTransferTransaction = this.page
+	readonly fundTransferTransaction: Locator = this.page
 		.getByRole('cell', { name: 'Funds Transfer Sent' })
 		.first();
 
-	readonly billPaymentTransaction = this.page
+	readonly billPaymentTransaction: Locator = this.page
 		.locator('td', { hasText: 'Bill Payment to ' })
 		.first();
 
-	readonly transactionId = this.page
+	readonly transactionId: Locator = this.page
 		.locator('td:right-of(:text("Transaction ID"))')
+		.first();
+
+	readonly dateOfTransaction: Locator = this.page
+		.locator('td:right-of(:text("Date"))')
+		.first();
+
+	readonly description: Locator = this.page
+		.locator('td:right-of(:text("Description"))')
+		.first();
+
+	readonly transactionType: Locator = this.page
+		.locator('td:right-of(:text("Type"))')
+		.first();
+
+	readonly transactionAmount: Locator = this.page
+		.locator('td:right-of(:text("Amount"))')
 		.first();
 }

@@ -25,12 +25,15 @@ export class BillPaymentpage extends BasePage {
 	readonly verifyAccount: Locator = this.page.locator(
 		'input[name="verifyAccount"]'
 	);
+
+	readonly fromAccount: Locator = this.page.getByRole('combobox');
+
 	readonly amount: Locator = this.page.locator('input[name="amount"]');
 	readonly sendPaymentButton: Locator = this.page.getByRole('button', {
 		name: 'Send Payment',
 	});
 
-	readonly successfulPaymentHeader = this.page.getByRole('heading', {
+	readonly successfulPaymentHeader: Locator = this.page.getByRole('heading', {
 		name: 'Bill Payment Complete',
 	});
 
@@ -41,7 +44,9 @@ export class BillPaymentpage extends BasePage {
 		await this.state.fill(Utility.getValue('state'));
 		await this.zipCode.fill(Utility.getValue('zipCode'));
 		await this.phoneNumber.fill(Utility.getValue('phoneNumber2'));
-		await this.amount.fill(Utility.getValue('amount'));
+		await this.amount.fill(Utility.getValue('billAmount'));
+
+		return Promise.resolve();
 	}
 
 	async enterAccountDetails(
@@ -50,5 +55,7 @@ export class BillPaymentpage extends BasePage {
 	): Promise<void> {
 		await this.accountNumber.fill(accountNumber);
 		await this.verifyAccount.fill(verifyAccount);
+
+		return Promise.resolve();
 	}
 }

@@ -67,6 +67,7 @@ export class RegisterPage extends BasePage {
 		await this.phoneNumber.fill(Utility.getValue('phoneNumber1'));
 		await this.socialSecurity.fill(this.firstName);
 		await this.userNameLocator.fill(this.userName);
+		return Promise.resolve();
 	}
 
 	async inputPassword(passwordDetails: string, confirmPassword: string) {
