@@ -187,6 +187,22 @@ test.describe('Bank application activities', async () => {
 		);
 	});
 
+	test('Check for broken links on the homepage', async ({ page, request }) => {
+		const links = await page.$$eval('a', (anchors) =>
+			anchors
+				.map((a) => a.href)
+				.filter(
+					(href) =>
+						href && !href.startsWith('javascript:') && !href.startsWith('#')
+				)
+		);
+
+		for (const link of links) {
+			const response = await request.get(link);
+			expect(response.status(), `Broken link: ${link}`).not.toEqual(200);
+		}
+	});
+
 	test('Create a savings account', async () => {
 		await overviewPage.openNewAccountLink.click();
 
