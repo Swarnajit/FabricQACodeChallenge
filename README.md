@@ -11,7 +11,7 @@ Follow these steps after that -
 1. Clone the git repository in your local machine
 2. Go to inside the folder (For example:- use "cd <your folderPath>)
 3. Run npm install
-4. Run npm init playwright@latest
+4. Run npm init playwright@latest choose "typescript"
 5. Run npx playwright install
 6. Run npx playwright test
 
